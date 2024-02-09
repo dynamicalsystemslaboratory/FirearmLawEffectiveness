@@ -1,8 +1,9 @@
-clc; clear;
+  clc; clear;
 
 % define directories
 main_dir = fileparts(matlab.desktop.editor.getActiveFilename); % record directory to the one containing this m-file
 datasets_directory = strcat(main_dir,'/processed-data/'); % folder with datasets
+results_directory = strcat(main_dir,'/results/'); % folder with datasets
 cd(datasets_directory);
 
 % load datasets
@@ -226,19 +227,6 @@ num_iterations = 50000;
 
 %%      Figure 1a: time series of national firearm restrictiveness       %%
 
-% figure
-% hold on
-% plot(months_2000_2019,firearm_law_fractions.restrictive_continuous,'Color',[255 0 0]/255,'LineWidth',1)
-% plot(months_2000_2019,firearm_law_fractions.permissive_continuous,'Color',[0 0 255]/255,'LineWidth',1)
-% plot(months_2000_2019,firearm_law_fractions.sum,'Color',[0 0 0]/255,'LineWidth',1)
-% xlabel('Time','fontweight','bold')
-% ylabel({'Firearm restrictiveness'},'fontweight','bold')
-% xlim([datetime("2000-01-01") datetime("2020-01-01")])
-% ylim([0 8])
-% legend('Restrictive','Permissive','Restrictive-Permissive','Position',[0.22 0.725 0.1 0.2])
-% hold off
-% set(gcf,'position',[10,10,600,200])
-
 figure
 hold on
 bar(months_2000_2019,firearm_law_counts.restrictive+firearm_law_counts.permissive,'FaceColor',[255 0 0]/255)
@@ -347,10 +335,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_deaths-per-firearm.csv'))
+
+
 
 %%                              (Figure 2a)                               %%
 
@@ -362,10 +356,12 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
@@ -399,10 +395,15 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_accidents-per-firearm.csv'))
+
 
 %%                              (Figure 2b)                              %%
 
@@ -414,10 +415,12 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
@@ -451,10 +454,15 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_homicides-per-firearm.csv'))
+
 
 %%                              (Figure 2c)                              %%
 
@@ -466,10 +474,12 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
@@ -503,10 +513,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_suicides-per-firearm.csv'))
 
 %%                              (Figure 2d)                              %%
 
@@ -518,13 +532,16 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
+
 
 %%
 %%             firearm restrictiveness -> firearm ownership              %%
@@ -555,10 +572,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_firearm-ownership.csv'))
 
 %%                              (Figure 2e)                              %%
 
@@ -570,10 +591,12 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
@@ -607,10 +630,15 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_firearm-deaths.csv'))
+
 
 %%                              (Figure 2f)                              %%
 
@@ -622,13 +650,16 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
+
 
 %%             firearm restrictiveness -> firearm accidents              %%
 
@@ -658,10 +689,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_firearm-accidents.csv'))
 
 %%                              (Figure 2g)                              %%
 
@@ -673,13 +708,16 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
+
 
 %%             firearm restrictiveness -> firearm homicides              %%
 
@@ -709,10 +747,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_firearm-homicides.csv'))
 
 %%                              (Figure 2h)                              %%
 
@@ -724,10 +766,12 @@ scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
 scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
 scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
@@ -761,10 +805,15 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
+
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_firearm-suicides.csv'))
+
 
 %%                              (Figure 2i)                              %%
 
@@ -774,16 +823,17 @@ plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
 scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
 scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
 scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
+scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
+scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
+xlabel('Delay (months)','fontweight','bold','FontName','Helvetica')
+ylabel({'Transfer entropy (bits)'},'fontweight','bold','FontName','Helvetica')
 xlim([0 13])
 xticks([0:13])
+ylim([0 0.04])
+yticks([0:0.01:0.04])
 xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
 hold off
 set(gcf,'position',[10,10,600,150])
-
 
 
 %%                                                                       %%
@@ -815,27 +865,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
-% plot the results (Table S2)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_deaths-per-background-check.csv'))
 
 
 %%  firearm restrictiveness -> deaths per integral of background checks  %%
@@ -866,27 +903,14 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
-% plot the results (Table S2)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_deaths-per-integral-background-checks.csv'))
 
 
 %%  firearm restrictiveness -> deaths per fraction of firearm suicides   %%
@@ -917,632 +941,322 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
-% plot the results (Table S2)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% determine significance and trends using False Discovery Rate
+results = correct_pvals(results);
+
+% save statistics
+writetable(results,strcat(results_directory,'/national_deaths-per-fraction-firearm-suicides.csv'))
 
 %%                                                                       %%
 %% --- copmute transfer entropy and partial correlations (regional) ---- %%
 %%                                                                       %%
-%%       firearm restrictiveness -> deaths per firearm (northeast)       %%
+%%             firearm restrictiveness -> deaths per firearm             %%
 
-x = firearm_law_fractions_sa_dt.northeast_sum;
-y = deaths_per_firearm_sa_dt.northeast;
+d = find(readtable(strcat(results_directory,'national_deaths-per-firearm.csv')).te==max(readtable(strcat(results_directory,'national_deaths-per-firearm.csv')).te))-1;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(4,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}],'RowNames',[{'Midest'} {'Northeast'} {'South'} {'West'}]);
 
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
-
-% symbolize time series
-x = x>median(x);
-y = y>median(y);
-
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
-
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
-
-%%        firearm restrictiveness -> deaths per firearm (midwest)        %%
-
+% midwest
 x = firearm_law_fractions_sa_dt.midwest_sum;
 y = deaths_per_firearm_sa_dt.midwest;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(1) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(1) = TE;
+results.p_value(1) = PV;
+results.sig(1) = PV<0.05;
+results.trd(1) = (PV>0.05)&(PV<0.1);
 
-%%         firearm restrictiveness -> deaths per firearm (west)          %%
 
-x = firearm_law_fractions_sa_dt.west_sum;
-y = deaths_per_firearm_sa_dt.west;
+% northeast
+x = firearm_law_fractions_sa_dt.northeast_sum;
+y = deaths_per_firearm_sa_dt.northeast;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(2) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(2) = TE;
+results.p_value(2) = PV;
+results.sig(2) = PV<0.05;
+results.trd(2) = (PV>0.05)&(PV<0.1);
 
-%%         firearm restrictiveness -> deaths per firearm (south)         %%
 
+% south
 x = firearm_law_fractions_sa_dt.south_sum;
 y = deaths_per_firearm_sa_dt.south;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(3) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(3) = TE;
+results.p_value(3) = PV;
+results.sig(3) = PV<0.05;
+results.trd(3) = (PV>0.05)&(PV<0.1);
+
+
+% west
+x = firearm_law_fractions_sa_dt.west_sum;
+y = deaths_per_firearm_sa_dt.west;
+
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(4) = r(2,1);
+
+% symbolize time series
+x = x>median(x);
+y = y>median(y);
+
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
+
+% enter statistics to results table
+results.te(4) = TE;
+results.p_value(4) = PV;
+results.sig(4) = PV<0.05;
+results.trd(4) = (PV>0.05)&(PV<0.1);
+
+writetable(results,strcat(results_directory,'/regional_deaths-per-firearm.csv'))
+
 
 %%                                                                       %%
-%%       firearm restrictiveness -> firearm ownership (northeast)        %%
+%%             firearm restrictiveness -> firearm ownership              %%
 
-x = firearm_law_fractions_sa_dt.northeast_sum;
-y = firearms_fo_sa_dt.northeast;
+d = find(readtable(strcat(results_directory,'national_firearm-ownership.csv')).te==max(readtable(strcat(results_directory,'national_firearm-ownership.csv')).te))-1;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(4,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}],'RowNames',[{'Midest'} {'Northeast'} {'South'} {'West'}]);
 
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
-
-% symbolize time series
-x = x>median(x);
-y = y>median(y);
-
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
-
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
-
-%%        firearm restrictiveness -> firearm ownership (midwest)         %%
-
+% midwest
 x = firearm_law_fractions_sa_dt.midwest_sum;
 y = firearms_fo_sa_dt.midwest;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(1) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(1) = TE;
+results.p_value(1) = PV;
+results.sig(1) = PV<0.05;
+results.trd(1) = (PV>0.05)&(PV<0.1);
 
-%%          firearm restrictiveness -> firearm ownership (west)          %%
 
-x = firearm_law_fractions_sa_dt.west_sum;
-y = firearms_fo_sa_dt.west;
+% northeast
+x = firearm_law_fractions_sa_dt.northeast_sum;
+y = firearms_fo_sa_dt.northeast;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(2) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(2) = TE;
+results.p_value(2) = PV;
+results.sig(2) = PV<0.05;
+results.trd(2) = (PV>0.05)&(PV<0.1);
 
-%%         firearm restrictiveness -> firearm ownership (south)          %%
 
+% south
 x = firearm_law_fractions_sa_dt.south_sum;
 y = firearms_fo_sa_dt.south;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(3) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(3) = TE;
+results.p_value(3) = PV;
+results.sig(3) = PV<0.05;
+results.trd(3) = (PV>0.05)&(PV<0.1);
+
+
+% west
+x = firearm_law_fractions_sa_dt.west_sum;
+y = firearms_fo_sa_dt.west;
+
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(4) = r(2,1);
+
+% symbolize time series
+x = x>median(x);
+y = y>median(y);
+
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
+
+% enter statistics to results table
+results.te(4) = TE;
+results.p_value(4) = PV;
+results.sig(4) = PV<0.05;
+results.trd(4) = (PV>0.05)&(PV<0.1);
+
+writetable(results,strcat(results_directory,'/regional_firearm-ownership.csv'))
+
 
 %%                                                                       %%
-%%         firearm restrictiveness -> firearm deaths (northeast)         %%
+%%              firearm restrictiveness -> firearm suicides              %%
 
-x = firearm_law_fractions_sa_dt.northeast_sum;
-y = firearm_deaths_sa_dt.northeast;
+d = find(readtable(strcat(results_directory,'national_firearm-suicides.csv')).te==max(readtable(strcat(results_directory,'national_firearm-suicides.csv')).te))-1;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(4,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}],'RowNames',[{'Midest'} {'Northeast'} {'South'} {'West'}]);
 
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
-
-% symbolize time series
-x = x>median(x);
-y = y>median(y);
-
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
-
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
-
-%%          firearm restrictiveness -> firearm deaths (midwest)          %%
-
+% midwest
 x = firearm_law_fractions_sa_dt.midwest_sum;
-y = firearm_deaths_sa_dt.midwest;
+y = firearm_suicides_sa_dt.midwest;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(1) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(1) = TE;
+results.p_value(1) = PV;
+results.sig(1) = PV<0.05;
+results.trd(1) = (PV>0.05)&(PV<0.1);
 
-%%           firearm restrictiveness -> firearm deaths (west)            %%
 
-x = firearm_law_fractions_sa_dt.west_sum;
-y = firearm_deaths_sa_dt.west;
+% northeast
+x = firearm_law_fractions_sa_dt.northeast_sum;
+y = firearm_suicides_sa_dt.northeast;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(2) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(2) = TE;
+results.p_value(2) = PV;
+results.sig(2) = PV<0.05;
+results.trd(2) = (PV>0.05)&(PV<0.1);
 
-%%           firearm restrictiveness -> firearm deaths (south)           %%
 
+% south
 x = firearm_law_fractions_sa_dt.south_sum;
-y = firearm_deaths_sa_dt.south;
+y = firearm_suicides_sa_dt.south;
 
-% create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
-
-% compute partial correlations
-disp("-----------Partial Correlations-----------")
-for d = 1:12
-    [r] = partialcorr([x(1:end-d) y(1+d:end)],y(1:end-d),'Type','Spearman');
-    results.rho(d) = r(2,1);
-    disp(strcat("delay: ",string(d)," months; partial correlation: ",string(round(r(2,1),2))))
-end
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(3) = r(2,1);
 
 % symbolize time series
 x = x>median(x);
 y = y>median(y);
 
-% compute transfer entropies
-disp("------------Transfer Entropies------------")
-for d = 0:11
-    x = x(1:end-d);
-    y = y(1+d:end);
-    [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
-    results.te(d+1) = TE;
-    results.p_value(d+1) = PV;
-    results.sig(d+1) = PV<0.05;
-    results.trd(d+1) = (PV>0.05)&(PV<0.1);
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
-end
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
 
-% plot the results (Figure 3)
-figure
-hold on
-plot([1:12],results.te,'Color',[0 0 0],'LineWidth',0.8)
-scatter([1:12],results.te,120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[225 225 225]/255)
-scatter(find((results.sig==1)&(results.rho<0)),results.te(find((results.sig==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[230 70 70]/255)
-scatter(find((results.trd==1)&(results.rho<0)),results.te(find((results.trd==1)&(results.rho<0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[255 200 200]/255)
-scatter(find((results.sig==1)&(results.rho>0)),results.te(find((results.sig==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[70 70 230]/255)
-scatter(find((results.trd==1)&(results.rho>0)),results.te(find((results.trd==1)&(results.rho>0))),120,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[200 200 255]/255)
-xlabel('Delay (months)','fontweight','bold')
-ylabel({'Transfer entropy (bits)'},'fontweight','bold')
-xlim([0 13])
-xticks([0:13])
-xticklabels({'','0','1','2','3','4','5','6','7','8','9','10','11',''})
-hold off
-set(gcf,'position',[10,10,600,150])
+% enter statistics to results table
+results.te(3) = TE;
+results.p_value(3) = PV;
+results.sig(3) = PV<0.05;
+results.trd(3) = (PV>0.05)&(PV<0.1);
+
+
+% west
+x = firearm_law_fractions_sa_dt.west_sum;
+y = firearm_suicides_sa_dt.west;
+
+[r] = partialcorr([x(1:end-(d+1)) y(1+(d+1):end)],y(1:end-(d+1)),'Type','Spearman');
+results.rho(4) = r(2,1);
+
+% symbolize time series
+x = x>median(x);
+y = y>median(y);
+
+% compute transfer entropy
+x = x(1:end-d);
+y = y(1+d:end);
+[TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
+
+% enter statistics to results table
+results.te(4) = TE;
+results.p_value(4) = PV;
+results.sig(4) = PV<0.05;
+results.trd(4) = (PV>0.05)&(PV<0.1);
+
+writetable(results,strcat(results_directory,'/regional_firearm-suicides.csv'))
+
 
 %%                                                                       %%
 %% --------------------- plot supplementary figures -------------------- %%
@@ -1678,6 +1392,3 @@ xlim([datetime("2000-01-01") datetime("2020-01-01")])
 ylim([100000000 200000000])
 hold off
 set(gcf,'position',[10,10,600,200])
-
-%%                                                                       %%
-%%                                                                       %%
