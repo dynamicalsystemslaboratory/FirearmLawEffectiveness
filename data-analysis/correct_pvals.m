@@ -15,8 +15,8 @@ if isempty(p_trd)
 end
 
 for d = 0:size(results,1)-1
-    results.sig(d+1) = results.p_value(d+1)<p_sig;
-    results.trd(d+1) = (results.p_value(d+1)>p_sig)&(results.p_value(d+1)<p_trd);
+    results.FDR_sig(d+1) = results.p_value(d+1)<p_sig;
+    results.FDR_trd(d+1) = (results.p_value(d+1)>p_sig)&(results.p_value(d+1)<p_trd);
 end
 
 

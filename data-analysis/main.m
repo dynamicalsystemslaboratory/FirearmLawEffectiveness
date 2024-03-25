@@ -231,14 +231,17 @@ figure
 hold on
 bar(months_2000_2019,firearm_law_counts.restrictive+firearm_law_counts.permissive,'FaceColor',[255 0 0]/255)
 bar(months_2000_2019,firearm_law_counts.permissive,'FaceColor',[0 0 255]/255)
-xlabel('Time','fontweight','bold')
-ylabel({'Number of firearm laws'},'fontweight','bold')
+xlabel('Time','fontweight','bold','FontSize',13)
+ylabel({'Number of firearm laws'},'fontweight','bold','FontSize',13)
 xlim([datetime("2000-01-01") datetime("2020-01-01")])
-ylim([0 14])
-legend('Restrictive','Permissive','Position',[0.17 0.72 0.1 0.2])
+ylim([0 15])
+legend('Restrictive','Permissive','FontSize',13,'Position',[0.19 0.72 0.1 0.2])
 hold off
 set(gcf,'position',[10,10,600,200])
-
+xticklabel_fs = get(gca,'XTickLabel');
+set(gca, 'XTickLabel', xticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
+yticklabel_fs = get(gca,'YTickLabel');
+set(gca, 'YTickLabel', yticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
 
 
 %%           Figure 1b: time series of national firearm deaths           %%
@@ -249,13 +252,17 @@ plot(months_2000_2019,firearm_deaths.USA,'-','Color',[0,0,0]/255,'LineWidth',0.8
 plot(months_2000_2019,firearm_suicides.USA,'-.','Color',[0,0,0]/255,'LineWidth',0.8)
 plot(months_2000_2019,firearm_homicides.USA,':','Color',[0,0,0]/255,'LineWidth',0.8)
 plot(months_2000_2019,firearm_accidents.USA,'--','Color',[0,0,0]/255,'LineWidth',0.8)
-xlabel('Time','fontweight','bold')
-ylabel({'Firearm deaths by intent'},'fontweight','bold')
+xlabel('Time','fontweight','bold','FontSize',13)
+ylabel({'Firearm deaths by intent'},'fontweight','bold','FontSize',13)
 xlim([datetime("2000-01-01") datetime("2020-01-01")])
-ylim([0 4000])
-legend('Deaths','Suicides','Homicides','Accidents','Position',[0.17 0.7 0.1 0.2])
+ylim([0 5000])
+legend('Deaths','Suicides','Homicides','Accidents','FontSize',12,'Position',[0.18 0.66 0.1 0.2])
 hold off
 set(gcf,'position',[10,10,600,200])
+xticklabel_fs = get(gca,'XTickLabel');
+set(gca, 'XTickLabel', xticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
+yticklabel_fs = get(gca,'YTickLabel');
+set(gca, 'YTickLabel', yticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
 
 
 %%         Figure 1c: time series of national number of firearms         %%
@@ -263,12 +270,16 @@ set(gcf,'position',[10,10,600,200])
 figure
 hold on
 plot(months_2000_2019,firearms_fo.USA,'Color',[0 0 0],'LineWidth',0.8)
-xlabel('Time','fontweight','bold')
-ylabel({'Firearm ownership'},'fontweight','bold')
+xlabel('Time','fontweight','bold','FontSize',13)
+ylabel({'Firearm ownership (millions)'},'fontweight','bold','FontSize',13)
 xlim([datetime("2000-01-01") datetime("2020-01-01")])
 ylim([0 300000000])
 hold off
 set(gcf,'position',[10,10,600,200])
+xticklabel_fs = get(gca,'XTickLabel');
+set(gca, 'XTickLabel', xticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
+yticklabel_fs = get(gca,'YTickLabel');
+set(gca, 'YTickLabel', yticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
 
 
 %%      Figure 1d: time series of national firearm restrictiveness       %%
@@ -276,13 +287,17 @@ set(gcf,'position',[10,10,600,200])
 figure
 hold on
 plot(months_2000_2019,firearm_law_fractions.sum,'Color',[0 0 0]/255,'LineWidth',1)
-xlabel('Time','fontweight','bold')
-ylabel({'Firearm restrictiveness'},'fontweight','bold')
+xlabel('Time','fontweight','bold','FontSize',13)
+ylabel({'Firearm restrictiveness'},'fontweight','bold','FontSize',13)
 xlim([datetime("2000-01-01") datetime("2020-01-01")])
 ylim([0 8])
 % legend('Restrictive','Permissive','Restrictive-Permissive','Position',[0.22 0.725 0.1 0.2])
 hold off
 set(gcf,'position',[10,10,600,200])
+xticklabel_fs = get(gca,'XTickLabel');
+set(gca, 'XTickLabel', xticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
+yticklabel_fs = get(gca,'YTickLabel');
+set(gca, 'YTickLabel', yticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
 
 
 %%              Figure 1e: time series of deaths per firearm             %%
@@ -293,14 +308,18 @@ plot(months_2000_2019,deaths_per_firearm.USA,'-','Color',[0 0 0],'LineWidth',0.8
 plot(months_2000_2019,suicides_per_firearm.USA,'-.','Color',[0,0,0]/255,'LineWidth',0.8)
 plot(months_2000_2019,homicides_per_firearm.USA,':','Color',[0,0,0]/255,'LineWidth',0.8)
 plot(months_2000_2019,accidents_per_firearm.USA,'--','Color',[0,0,0]/255,'LineWidth',0.8)
-xlabel('Time','fontweight','bold')
-ylabel({'Deaths per firearm'},'fontweight','bold')
+xlabel('Time','fontweight','bold','FontSize',13)
+ylabel({'Deaths per firearm'},'fontweight','bold','FontSize',13)
 xlim([datetime("2000-01-01") datetime("2020-01-01")])
 ylim([0 0.00005])
 yticks([0:0.00001:0.00005])
-legend('All deaths','Suicides','Homicides','Accidents','Position',[0.2 0.7 0.1 0.2])
+legend('All deaths','Suicides','Homicides','Accidents','FontSize',12,'Position',[0.18 0.66 0.1 0.2])
 hold off
 set(gcf,'position',[10,10,600,200])
+xticklabel_fs = get(gca,'XTickLabel');
+set(gca, 'XTickLabel', xticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
+yticklabel_fs = get(gca,'YTickLabel');
+set(gca, 'YTickLabel', yticklabel_fs, 'FontName', 'Helvetica', 'fontsize', 13);
 
 
 
@@ -313,7 +332,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = deaths_per_firearm_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -335,6 +355,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -342,7 +372,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_deaths-per-firearm.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-DeathsPerFirearm.csv'))
 
 
 
@@ -373,7 +403,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = accidents_per_firearm_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -395,14 +426,24 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
 % determine significance and trends using False Discovery Rate
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_accidents-per-firearm.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-AccidentsPerFirearm.csv'))
 
 
 %%                              (Figure 2b)                              %%
@@ -432,7 +473,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = homicides_per_firearm_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -454,14 +496,24 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
 % determine significance and trends using False Discovery Rate
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_homicides-per-firearm.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-HomicidesPerFirearm.csv'))
 
 
 %%                              (Figure 2c)                              %%
@@ -491,7 +543,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = suicides_per_firearm_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -513,14 +566,24 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
 % determine significance and trends using False Discovery Rate
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_suicides-per-firearm.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-SuicidesPerFirearm.csv'))
 
 %%                              (Figure 2d)                              %%
 
@@ -550,7 +613,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = firearms_fo_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -572,14 +636,24 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
 % determine significance and trends using False Discovery Rate
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_firearm-ownership.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-FirearmOwnership.csv'))
 
 %%                              (Figure 2e)                              %%
 
@@ -608,7 +682,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = firearm_deaths_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -630,14 +705,24 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
-    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,2))," (",string(round(PV,2)),")"))
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
+    disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
 % determine significance and trends using False Discovery Rate
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_firearm-deaths.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-FirearmDeaths.csv'))
 
 
 %%                              (Figure 2f)                              %%
@@ -667,7 +752,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = firearm_accidents_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -689,6 +775,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -696,7 +792,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_firearm-accidents.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-FirearmAccidents.csv'))
 
 %%                              (Figure 2g)                              %%
 
@@ -725,7 +821,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = firearm_homicides_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -747,6 +844,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -754,7 +861,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_firearm-homicides.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-FirearmHomicides.csv'))
 
 %%                              (Figure 2h)                              %%
 
@@ -783,7 +890,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = firearm_suicides_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -805,6 +913,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -812,7 +930,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_firearm-suicides.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-FirearmSuicides.csv'))
 
 
 %%                              (Figure 2i)                              %%
@@ -843,7 +961,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = deaths_per_bc_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -865,6 +984,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -872,7 +1001,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_deaths-per-background-check.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-DeathsPerBackgoundChecks.csv'))
 
 
 %%  firearm restrictiveness -> deaths per integral of background checks  %%
@@ -881,7 +1010,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = deaths_per_int_bc_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -903,6 +1033,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -910,7 +1050,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_deaths-per-integral-background-checks.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-DeathsPerIntegralBackgoundChecks.csv'))
 
 
 %%  firearm restrictiveness -> deaths per fraction of firearm suicides   %%
@@ -919,7 +1059,8 @@ x = firearm_law_fractions_sa_dt.sum;
 y = deaths_per_ffs_firearm_sa_dt.USA;
 
 % create empty table to hold partial correlation and transfer entropy results
-results=array2table(nan(12,5),'VariableNames',[{'te'} {'p_value'} {'sig'} {'trd'} {'rho'}]);
+results=array2table(nan(12,8),'VariableNames',[{'delay'} {'te'} {'p_value'} {'sig'} {'trd'} {'FDR_sig'} {'FDR_trd'} {'rho'}]);
+results.delay = [0:11]';
 
 % compute partial correlations
 disp("-----------Partial Correlations-----------")
@@ -941,6 +1082,16 @@ for d = 0:11
     [TE,SD,P,PV] = compute_transfer_entropy(x,y,num_iterations);
     results.te(d+1) = TE;
     results.p_value(d+1) = PV;
+    if PV<=0.05
+        results.sig(d+1) = 1;
+        results.trd(d+1) = 0;
+    elseif PV<=0.1
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 1;
+    else
+        results.sig(d+1) = 0;
+        results.trd(d+1) = 0;
+    end
     disp(strcat("delay: ",string(d)," months; transfer entropy: ",string(round(TE,3))," (",string(round(PV,3)),")"))
 end
 
@@ -948,7 +1099,7 @@ end
 results = correct_pvals(results);
 
 % save statistics
-writetable(results,strcat(results_directory,'/national_deaths-per-fraction-firearm-suicides.csv'))
+writetable(results,strcat(results_directory,'/National_Restrictiveness-DeathsPerFractionFirearmSuicides.csv'))
 
 %%                                                                       %%
 %% --- copmute transfer entropy and partial correlations (regional) ---- %%
@@ -1051,7 +1202,7 @@ results.p_value(4) = PV;
 results.sig(4) = PV<0.05;
 results.trd(4) = (PV>0.05)&(PV<0.1);
 
-writetable(results,strcat(results_directory,'/regional_deaths-per-firearm.csv'))
+writetable(results,strcat(results_directory,'/Regional_Restrictiveness-DeathsPerFirearm.csv'))
 
 
 %%                                                                       %%
@@ -1153,7 +1304,7 @@ results.p_value(4) = PV;
 results.sig(4) = PV<0.05;
 results.trd(4) = (PV>0.05)&(PV<0.1);
 
-writetable(results,strcat(results_directory,'/regional_firearm-ownership.csv'))
+writetable(results,strcat(results_directory,'/Regional_Restrictiveness-FirearmOwnership.csv'))
 
 
 %%                                                                       %%
@@ -1255,7 +1406,7 @@ results.p_value(4) = PV;
 results.sig(4) = PV<0.05;
 results.trd(4) = (PV>0.05)&(PV<0.1);
 
-writetable(results,strcat(results_directory,'/regional_firearm-suicides.csv'))
+writetable(results,strcat(results_directory,'/Regional_Restrictiveness-FirearmSuicides.csv'))
 
 
 %%                                                                       %%
@@ -1392,3 +1543,6 @@ xlim([datetime("2000-01-01") datetime("2020-01-01")])
 ylim([100000000 200000000])
 hold off
 set(gcf,'position',[10,10,600,200])
+
+%%                                                                       %%
+%%                                                                       %%
